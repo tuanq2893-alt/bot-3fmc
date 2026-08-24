@@ -14,13 +14,12 @@ const DOMAIN = '3fmc.com';
 
 let proxyList = [];
 
-// Tải riêng danh sách Proxy IP Việt Nam (VN)
+// Kéo IP VN nhanh, gọn, sạch
 async function fetchVNProxies() {
   console.log('>>> [AUTO] Đang tải danh sách IP Proxy VIỆT NAM...');
   const urls = [
-    'https://api.proxyscrape.com/v2/?request=displayproxies&protocol=socks5,http&timeout=5000&country=VN&ssl=all&anonymity=all',
-    'https://raw.githubusercontent.com/jetkai/proxy-list/main/online-proxies/txt/proxies-vietnam.txt',
-    'https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt'
+    'https://api.proxyscrape.com/v2/?request=displayproxies&protocol=socks5,http&timeout=3000&country=VN&ssl=all&anonymity=all',
+    'https://raw.githubusercontent.com/jetkai/proxy-list/main/online-proxies/txt/proxies-vietnam.txt'
   ];
 
   let combined = [];
@@ -47,7 +46,14 @@ async function fetchVNProxies() {
   console.log(`>>> [AUTO] Đã tìm thấy ${proxyList.length} Proxy IP Việt Nam! Bắt đầu thử...`);
 }
 
-// Thử kết nối SOCKS5
+// BỘ ĐẾM ÉP THỜI GIAN: Bắt buộc hủy sau 3s nếu proxy treo
+const withTimeout = (promise, ms) => {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout khắt khe')), ms))
+  ]);
+};
+
 function testSocks5(proxy) {
   return new Promise((resolve, reject) => {
     SocksClient.createConnection({
@@ -59,7 +65,6 @@ function testSocks5(proxy) {
   });
 }
 
-// Thử kết nối HTTP CONNECT Tunnel
 function testHttpConnect(proxy) {
   return new Promise((resolve, reject) => {
     const socket = net.connect(proxy.port, proxy.host, () => {
@@ -79,10 +84,16 @@ async function findWorkingSocket() {
   if (proxyList.length < 10) await fetchVNProxies();
 
   while (proxyList.length > 0) {
-    const batch = proxyList.splice(0, 10);
-    console.log(`>>> Đang test 10 IP Việt Nam... (Còn lại: ${proxyList.length})`);
+    // Ép tốc độ quét 30 IP cùng 1 lúc thay vì 10
+    const batch = proxyList.splice(0, 30);
+    console.log(`>>> Đang test 30 IP Việt Nam tốc độ cao... (Còn lại: ${proxyList.length})`);
 
-    const tests = batch.flatMap(p => [testSocks5(p), testHttpConnect(p)]);
+    // Áp dụng chặt chém Timeout 3 giây cho toàn bộ IP
+    const tests = batch.flatMap(p => [
+      withTimeout(testSocks5(p), 3000), 
+      withTimeout(testHttpConnect(p), 3000)
+    ]);
+    
     const results = await Promise.allSettled(tests);
     const successful = results.filter(r => r.status === 'fulfilled').map(r => r.value);
 
