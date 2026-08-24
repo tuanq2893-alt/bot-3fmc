@@ -7,24 +7,27 @@ const mineflayer = require('mineflayer');
 const net = require('net');
 
 function createBot() {
-  console.log('>>> [1/5] Đang thiết lập kết nối Cloudflare Tunnel...');
+  console.log('>>> [1/5] Đang tạo kết nối Socket trực tiếp đến 3FMC...');
 
-  // Khởi tạo socket kết nối qua cổng Cloudflare WARP
-  const socket = net.connect({
+  // Tạo Socket kết nối trực tiếp tối ưu hóa KeepAlive
+  const client = net.connect({
     host: '3fmc.com',
     port: 25565,
-    timeout: 30000
+    noDelay: true
   }, () => {
-    console.log('>>> Thông đường truyền thành công! Đang vào game...');
+    console.log('>>> Thông tuyến Socket! Đang vào game...');
   });
 
+  client.setKeepAlive(true, 10000);
+
   const bot = mineflayer.createBot({
-    stream: socket,
+    stream: client,
     host: '3fmc.com',
     port: 25565,
     username: 'hkurxf',
     auth: 'offline',
-    version: '1.20.1'
+    version: '1.20.1',
+    checkTimeoutInterval: 120000
   });
 
   bot.on('spawn', () => {
@@ -71,7 +74,7 @@ function createBot() {
   });
 
   bot.on('end', (reason) => {
-    console.log(`Mất kết nối (${reason})! Đang thử lại sau 5s...`);
+    console.log(`Mất kết nối (${reason})! Đang kết nối lại sau 5s...`);
     setTimeout(createBot, 5000);
   });
 
