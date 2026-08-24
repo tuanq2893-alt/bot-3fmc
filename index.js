@@ -7,7 +7,7 @@ const mineflayer = require('mineflayer');
 const { SocksClient } = require('socks');
 
 // Proxy Việt Nam sạch
-const PROXY_HOST = '103.152.118.238'; 
+const PROXY_HOST = '14.225.210.13'; 
 const PROXY_PORT = 1080;
 
 function createBot() {
