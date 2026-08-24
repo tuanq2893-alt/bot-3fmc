@@ -1,16 +1,22 @@
 const express = require('express');
 const app = express();
 app.get('/', (req, res) => res.send('Bot hkurxf đang tu luyện 24/7!'));
-app.listen(process.env.PORT || 3000);
+app.listen(process.env.PORT || 10000);
 
 const mineflayer = require('mineflayer');
-const { SocksProxyAgent } = require('socks-proxy-agent');
+const { HttpProxyAgent } = require('http-proxy-agent');
+
+// Thông số lấy trực tiếp từ Webshare của mi
+const PROXY_HOST = '31.59.20.176';
+const PROXY_PORT = '6754';
+const PROXY_USER = 'upviidqh';
+const PROXY_PASS = 'm848moodxeot';
 
 function createBot() {
-  console.log('Đang kết nối bot hkurxf qua Proxy VN...');
-  
-  // Gắn IP Proxy VN của mi vào đây
-  const agent = new SocksProxyAgent('socks5://103.109.187.33:1080');
+  console.log('Đang kết nối bot hkurxf qua Proxy Webshare...');
+
+  const proxyUrl = `http://${PROXY_USER}:${PROXY_PASS}@${PROXY_HOST}:${PROXY_PORT}`;
+  const agent = new HttpProxyAgent(proxyUrl);
 
   const bot = mineflayer.createBot({
     host: '3fmc.com',
@@ -22,15 +28,13 @@ function createBot() {
   });
 
   bot.on('spawn', () => {
-    console.log('>>> hkurxf ĐÃ VÀO SERVER SUCCESS (Qua Proxy VN)! <<<');
+    console.log('>>> hkurxf ĐÃ VÀO SERVER LOBBY! <<<');
 
-    // BƯỚC 1: Đăng nhập
     setTimeout(() => {
       bot.chat('/login 24102014(Tuan)');
       console.log('1. hkurxf đã gửi lệnh đăng nhập!');
     }, 3000);
 
-    // BƯỚC 2: Cầm ô số 5 (La bàn) & Mở
     setTimeout(() => {
       bot.setQuickBarSlot(4);
       console.log('2. hkurxf đã chuyển sang ô số 5 (La bàn)');
@@ -41,7 +45,6 @@ function createBot() {
       }, 1000);
     }, 7000);
 
-    // BƯỚC 3: Chọn Tu Tiên
     bot.once('windowOpen', async (window) => {
       console.log('4. Đã mở Menu La Bàn! Đang chọn SMP Tu Tiên...');
       
@@ -58,7 +61,6 @@ function createBot() {
       }
     });
 
-    // BƯỚC 4: /tuluyen & Đổi ô 1 - 2
     setTimeout(() => {
       bot.chat('/tuluyen');
       console.log('6. hkurxf đã gõ lệnh /tuluyen!');
