@@ -4,28 +4,33 @@ app.get('/', (req, res) => res.send('Bot hkurxf đang tu luyện 24/7!'));
 app.listen(process.env.PORT || 3000);
 
 const mineflayer = require('mineflayer');
+const { SocksProxyAgent } = require('socks-proxy-agent');
 
 function createBot() {
-  console.log('Đang kết nối bot hkurxf vào 3fmc.com...');
+  console.log('Đang kết nối bot hkurxf qua Proxy VN...');
   
+  // Gắn IP Proxy VN của mi vào đây
+  const agent = new SocksProxyAgent('socks5://103.109.187.33:1080');
+
   const bot = mineflayer.createBot({
     host: '3fmc.com',
     port: 25565,
     username: 'hkurxf',
     auth: 'offline',
-    version: '1.20.1'
+    version: '1.20.1',
+    agent: agent
   });
 
   bot.on('spawn', () => {
-    console.log('>>> hkurxf ĐÃ VÀO SERVER LOBBY! <<<');
+    console.log('>>> hkurxf ĐÃ VÀO SERVER SUCCESS (Qua Proxy VN)! <<<');
 
-    // BƯỚC 1: Đăng nhập (Chờ 3s)
+    // BƯỚC 1: Đăng nhập
     setTimeout(() => {
       bot.chat('/login 24102014(Tuan)');
       console.log('1. hkurxf đã gửi lệnh đăng nhập!');
     }, 3000);
 
-    // BƯỚC 2: Cầm ô số 5 (Index 4) & Click chuột phải mở La Bàn (Chờ 7s)
+    // BƯỚC 2: Cầm ô số 5 (La bàn) & Mở
     setTimeout(() => {
       bot.setQuickBarSlot(4);
       console.log('2. hkurxf đã chuyển sang ô số 5 (La bàn)');
@@ -36,26 +41,24 @@ function createBot() {
       }, 1000);
     }, 7000);
 
-    // BƯỚC 3: Lắng nghe Menu GUI mở ra & Bấm chọn 'SMP Tu Tiên'
+    // BƯỚC 3: Chọn Tu Tiên
     bot.once('windowOpen', async (window) => {
-      console.log('4. Đã mở Menu La Bàn! Đang tìm icon SMP Tu Tiên...');
+      console.log('4. Đã mở Menu La Bàn! Đang chọn SMP Tu Tiên...');
       
-      // Tìm vật phẩm có tên chứa 'Tu Tiên' hoặc 'SMP'
       const tuTienItem = window.slots.find(item => 
         item && item.customName && (item.customName.includes('Tu Tiên') || item.customName.includes('SMP'))
       );
 
       if (tuTienItem) {
         await bot.clickWindow(tuTienItem.slot, 0, 0);
-        console.log(`5. Đã click vào ô ${tuTienItem.slot} (SMP Tu Tiên)!`);
+        console.log(`5. Đã click ô ${tuTienItem.slot} (Tu Tiên)!`);
       } else {
-        // Nếu không quét được tên, mặc định click vào ô giữa Menu (thường là ô 13 hoặc 14)
         await bot.clickWindow(13, 0, 0); 
-        console.log('5. Đã click chọn chuyển server SMP!');
+        console.log('5. Đã click chuyển server!');
       }
     });
 
-    // BƯỚC 4: Vào Tu Tiên SMP -> Gõ /tuluyen & Đổi ô 1 - 2 mỗi 10s (Chờ 16s)
+    // BƯỚC 4: /tuluyen & Đổi ô 1 - 2
     setTimeout(() => {
       bot.chat('/tuluyen');
       console.log('6. hkurxf đã gõ lệnh /tuluyen!');
@@ -73,11 +76,11 @@ function createBot() {
   });
 
   bot.on('end', () => {
-    console.log('hkurxf mất kết nối! Đang kết nối lại sau 5s...');
+    console.log('hkurxf mất kết nối! Thử lại sau 5s...');
     setTimeout(createBot, 5000);
   });
 
-  bot.on('error', err => console.log('Lỗi Bot:', err.message));
+  bot.on('error', err => console.log('Lỗi Bot/Proxy:', err.message));
 }
 
 createBot();
