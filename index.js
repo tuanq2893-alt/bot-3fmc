@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 
-app.get('/', (req, res) => res.send('Bot hkurxf 3FMC đang chạy 24/7 trên Render!'));
+app.get('/', (req, res) => res.send('Bot hkurxf 3FMC đang chạy 24/7!'));
 app.listen(process.env.PORT || 10000);
 
 const mineflayer = require('mineflayer');
@@ -15,7 +15,6 @@ function createBot() {
     username: 'hkurxf',
     auth: 'offline',
     version: '1.20.1',
-    keepAlive: true,
     checkTimeoutInterval: 120000
   });
 
