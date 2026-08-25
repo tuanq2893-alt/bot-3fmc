@@ -6,14 +6,14 @@ app.listen(process.env.PORT || 10000);
 const mineflayer = require('mineflayer');
 
 function createBot() {
-  console.log('>>> [1/5] Đang kết nối trực tiếp tới 3fmc.com...');
+  console.log('>>> [1/5] Đang phân giải SRV và kết nối tới 3fmc.com...');
 
   const bot = mineflayer.createBot({
     host: '3fmc.com',
-    port: 25565,
     username: 'hkurxf',
     auth: 'offline',
-    version: '1.20.1'
+    version: '1.20.1',
+    checkTimeoutInterval: 30000
   });
 
   bot.on('spawn', () => {
