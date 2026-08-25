@@ -6,10 +6,10 @@ app.listen(process.env.PORT || 10000);
 const mineflayer = require('mineflayer');
 
 function createBot() {
-  console.log('>>> [1/5] Đang kết nối vào 3FMC qua Cloudflare Tunnel...');
+  console.log('>>> [1/5] Đang kết nối qua Playit Tunnel (drake-pastry.tun.ply.gg:25565)...');
 
   const bot = mineflayer.createBot({
-    host: '3fmc.com',
+    host: 'drake-pastry.tun.ply.gg',
     port: 25565,
     username: 'hkurxf',
     auth: 'offline',
