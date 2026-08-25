@@ -6,10 +6,10 @@ app.listen(process.env.PORT || 10000);
 const mineflayer = require('mineflayer');
 
 function createBot() {
-  console.log('>>> [1/5] Đang kết nối tới play.3fmc.com...');
+  console.log('>>> [1/5] Đang thử kết nối qua play.3fmc.com...');
 
   const bot = mineflayer.createBot({
-    host: 'play.3fmc.com', // Dùng subdomain trực tiếp bypass Cloudflare
+    host: 'play.3fmc.com', // Đổi host thành play.3fmc.com
     port: 25565,
     username: 'hkurxf',
     auth: 'offline',
