@@ -4,17 +4,39 @@ app.get('/', (req, res) => res.send('Bot Render Tu Tiên đang chạy!'));
 app.listen(process.env.PORT || 10000);
 
 const mineflayer = require('mineflayer');
+const { SocksClient } = require('socks');
 
 function createBot() {
-  console.log('>>> [1/5] Đang thử kết nối qua play.3fmc.com...');
+  console.log('>>> [1/5] Đang kết nối tới 3fmc.com qua Proxy...');
 
   const bot = mineflayer.createBot({
-    host: 'play.3fmc.com', // Đổi host thành play.3fmc.com
+    host: '3fmc.com',
     port: 25565,
     username: 'hkurxf',
     auth: 'offline',
     version: '1.20.1',
-    checkTimeoutInterval: 30000
+    checkTimeoutInterval: 60000,
+    connect: (client) => {
+      SocksClient.createConnection({
+        proxy: {
+          host: '103.152.118.38', // SOCKS5 IP Việt Nam bypass Anti-DDoS
+          port: 1080,
+          type: 5
+        },
+        command: 'connect',
+        destination: {
+          host: '3fmc.com',
+          port: 25565
+        }
+      }, (err, info) => {
+        if (err) {
+          console.log('Proxy lỗi, thử lại trực tiếp...', err.message);
+          return;
+        }
+        client.setSocket(info.socket);
+        client.emit('connect');
+      });
+    }
   });
 
   bot.on('spawn', () => {
